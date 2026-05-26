@@ -71,7 +71,7 @@ export default function RacketsPage() {
     }
 
     try {
-      const response = await apiClient.get<{ rackets: Racket[] }>('/api/v1/rackets/recommendations');
+      const response = await apiClient.get<{ rackets: Racket[] }>('/rackets/recommendations');
       setRackets(response.rackets);
       toast.success('已載入個人化推薦');
     } catch (error: any) {

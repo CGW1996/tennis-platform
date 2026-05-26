@@ -19,6 +19,19 @@ export interface MatchingUser {
   gender?: string;
   playingFrequency?: string;
   preferredTimes?: string[];
+  requestId?: string;
+  specialRequirements?: string;
+  availabilitySlots?: {
+    day: string;
+    startTime: string;
+    endTime: string;
+    location: string;
+  }[];
+  lookingFor?: {
+    ntrpMin: number;
+    ntrpMax: number;
+    playTypes?: string[];
+  };
 }
 
 

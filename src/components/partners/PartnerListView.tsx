@@ -75,38 +75,82 @@ export function PartnerListView({ users, onAction, actionLoading }: PartnerListV
                                     </div>
                                 </div>
 
-                                {user.bio && (
+                                {user.specialRequirements && (
                                     <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-                                        {user.bio}
+                                        {user.specialRequirements}
                                     </p>
                                 )}
 
-                                <div className="mt-4 flex flex-wrap gap-2 text-xs text-gray-500">
-                                    {user.location?.address && (
-                                        <span className="bg-gray-100 px-2 py-1 rounded">
-                                            📍 {user.location.address}
-                                        </span>
+                                <div className="mt-4 flex flex-col gap-2 bg-gray-50 rounded p-2 text-xs text-gray-600">
+                                    {/* Request Specific Info */}
+                                    {user.lookingFor && (
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 whitespace-nowrap">
+                                                    尋找
+                                                </span>
+                                                <span>NTRP {user.lookingFor.ntrpMin} - {user.lookingFor.ntrpMax}</span>
+                                            </div>
+                                            {user.lookingFor.playTypes && user.lookingFor.playTypes.length > 0 && (
+                                                <>
+                                                    <span className="text-gray-300">|</span>
+                                                    <span className="text-gray-600">
+                                                        {user.lookingFor.playTypes.map(type => {
+                                                            const map: Record<string, string> = {
+                                                                'rally': '拉球',
+                                                                'singles': '單打',
+                                                                'doubles': '雙打'
+                                                            };
+                                                            return map[type] || type;
+                                                        }).join('、')}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
                                     )}
-                                    {user.gender && (
-                                        <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                                            {formatGender(user.gender)}
-                                        </span>
+
+                                    {user.availabilitySlots && user.availabilitySlots.length > 0 ? (
+                                        <div className="flex flex-col gap-1">
+                                            {user.availabilitySlots.map((slot, idx) => (
+                                                <div key={idx} className="flex gap-2 items-center">
+                                                    <span className="font-semibold bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-100 whitespace-nowrap">
+                                                        {slot.day}
+                                                    </span>
+                                                    <span>{slot.startTime}-{slot.endTime}</span>
+                                                    <span className="text-gray-400">|</span>
+                                                    <span className="truncate" title={slot.location}>{slot.location}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        // Fallback to Profile Location/Times if no slots (legacy support)
+                                        <div className="flex flex-wrap gap-2">
+                                            {user.location?.address && (
+                                                <span className="bg-white border border-gray-200 px-2 py-1 rounded">
+                                                    📍 {user.location.address}
+                                                </span>
+                                            )}
+                                            {user.preferredTimes && user.preferredTimes.length > 0 && (
+                                                <span className="bg-white border border-gray-200 px-2 py-1 rounded max-w-full truncate">
+                                                    ⏰ {formatPreferredTimes(user.preferredTimes)}
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
-                                    {user.playingStyle && (
-                                        <span className="bg-gray-100 px-2 py-1 rounded">
-                                            🎾 {formatPlayingStyle(user.playingStyle)}
-                                        </span>
-                                    )}
-                                    {user.playingFrequency && (
-                                        <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded">
-                                            📅 {formatPlayingFrequency(user.playingFrequency)}
-                                        </span>
-                                    )}
-                                    {user.preferredTimes && user.preferredTimes.length > 0 && (
-                                        <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded max-w-full truncate" title={user.preferredTimes.join(', ')}>
-                                            ⏰ {formatPreferredTimes(user.preferredTimes)}
-                                        </span>
-                                    )}
+
+                                    {/* Additional generic info */}
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {user.gender && (
+                                            <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded">
+                                                {formatGender(user.gender)}
+                                            </span>
+                                        )}
+                                        {user.playingStyle && (
+                                            <span className="bg-gray-100 px-2 py-1 rounded">
+                                                🎾 {formatPlayingStyle(user.playingStyle)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

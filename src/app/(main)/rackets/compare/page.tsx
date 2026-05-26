@@ -28,7 +28,7 @@ function RacketComparePageContent() {
       let comparisonIds: string[] = [];
 
       if (isAuthenticated) {
-        const response = await apiClient.get<{ racket_ids: string[] }>('/api/v1/rackets/comparison');
+        const response = await apiClient.get<{ racket_ids: string[] }>('/rackets/comparison');
         comparisonIds = response.racket_ids;
       }
 
@@ -39,7 +39,7 @@ function RacketComparePageContent() {
       }
 
       if (comparisonIds.length > 0) {
-        const racketsResponse = await apiClient.post<{ rackets: Racket[] }>('/api/v1/rackets/batch', {
+        const racketsResponse = await apiClient.post<{ rackets: Racket[] }>('/rackets/batch', {
           racket_ids: comparisonIds
         });
         setComparisonRackets(racketsResponse.rackets);
@@ -112,7 +112,7 @@ function RacketComparePageContent() {
 
     if (isAuthenticated) {
       try {
-        await apiClient.delete('/api/v1/rackets/comparison/clear');
+        await apiClient.delete('/rackets/comparison/clear');
       } catch (error) {
         console.error('清空比較清單失敗:', error);
       }

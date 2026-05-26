@@ -16,3 +16,7 @@ export {
 
 // Layout Components
 export { default as MainLayout } from './layout/MainLayout';
+
+// Partners Components
+export { CreatePartnerRequestModal } from './partners/CreatePartnerRequestModal';
+export { PartnerListView } from './partners/PartnerListView';

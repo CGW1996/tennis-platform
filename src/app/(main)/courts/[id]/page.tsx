@@ -90,7 +90,7 @@ export default function CourtDetailPage({ params }: { params: Promise<{ id: stri
 
     setBookingLoading(true);
     try {
-      await apiClient.post('/api/v1/bookings', data);
+      await apiClient.post('/bookings', data);
       toast.success('預訂成功！');
       setShowBookingModal(false);
       if (selectedDate) {

@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MainLayout, Button, Input, Card, CardContent } from '@/components';
+import { MainLayout, Button, Input, Card, CardContent, CreatePartnerRequestModal } from '@/components';
 import { matchingPreferencesSchema, type MatchingPreferencesForm } from '@/lib/validations';
 import { useAuthStore } from '@/stores';
 import { apiClient } from '@/lib/api-client';
 import toast from 'react-hot-toast';
-import { PartnerListView } from '@/components/partners/PartnerListView';
+import { PartnerListView } from '@/components';
 import { TAIWAN_CITIES } from '@/constants/locations';
 import { MatchingUser } from '@/types/matching';
 
@@ -27,6 +27,7 @@ export default function MatchingPage() {
   const [matches, setMatches] = useState<MatchingUser[]>([]);
   const [viewMode, setViewMode] = useState<'swipe' | 'list'>('list');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Filter Group States
   const [selectedDays, setSelectedDays] = useState<('weekday' | 'weekend')[]>([]);
@@ -71,8 +72,8 @@ export default function MatchingPage() {
 
       const params = preferences || defaultParams;
 
-      const response = await apiClient.post<{ matches: MatchingUser[] }>('/matching/find', params);
-      setUsers(response.matches);
+      const response = await apiClient.post<{ partners: MatchingUser[] }>('/partners/find', params);
+      setUsers(response.partners || []);
       setCurrentIndex(0);
     } catch (error: any) {
       toast.error(error.response?.data?.message || '載入失敗');
@@ -92,7 +93,7 @@ export default function MatchingPage() {
       const backendAction = action === 'pass' ? 'skip' : action;
 
       const response = await apiClient.post<{ result?: { matched?: boolean; user?: MatchingUser } }>(
-        '/api/v1/matching/card-action',
+        '/discovery/card-action',
         { targetUserId: userId, action: backendAction }
       );
 
@@ -185,6 +186,23 @@ export default function MatchingPage() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Create Partner Request Button */}
+            <Button
+              onClick={() => {
+                if (!currentUser) {
+                  window.location.href = '/login?redirect=/partners';
+                  return;
+                }
+                setShowCreateModal(true);
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              我要找球友
+            </Button>
+
             {/* View Toggle */}
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
@@ -313,8 +331,8 @@ export default function MatchingPage() {
                               type="button"
                               onClick={() => toggleDay(day as 'weekday' | 'weekend')}
                               className={`px-3 py-1 rounded text-sm border ${selectedDays.includes(day as any)
-                                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                                  : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                                 }`}
                             >
                               {day === 'weekday' ? '平日' : '假日'}
@@ -331,8 +349,8 @@ export default function MatchingPage() {
                               type="button"
                               onClick={() => toggleTime(time as 'morning' | 'afternoon' | 'evening')}
                               className={`px-3 py-1 rounded text-sm border ${selectedTimes.includes(time as any)
-                                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                                  : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                                 }`}
                             >
                               {time === 'morning' ? '早' : time === 'afternoon' ? '午' : '晚'}
@@ -466,6 +484,13 @@ export default function MatchingPage() {
             )}
           </div>
         </div>
+
+        {/* Create Partner Request Modal */}
+        <CreatePartnerRequestModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => fetchMatchingUsers(getValues())}
+        />
       </div>
     </MainLayout>
   );
@@ -531,15 +556,42 @@ function SwipeCard({ user, onSwipe, isAnimating }: SwipeCardProps) {
           {/* User Details */}
           <div className="p-6">
             <div className="space-y-3">
+              {/* Request Info Highlights */}
+              {user.lookingFor && (
+                <div className="bg-emerald-50 p-2 rounded-lg mb-3">
+                  <span className="block text-xs text-emerald-600 mb-1 font-semibold">尋找等級</span>
+                  <span className="text-emerald-900 font-medium">NTRP {user.lookingFor.ntrpMin} - {user.lookingFor.ntrpMax}</span>
+                </div>
+              )}
+
+              {user.availabilitySlots && user.availabilitySlots.length > 0 && (
+                <div className="mb-3">
+                  <span className="block text-xs text-gray-500 mb-1">偏好時間與地點</span>
+                  <div className="space-y-1">
+                    {user.availabilitySlots.map((slot, idx) => (
+                      <div key={idx} className="flex flex-col bg-gray-50 p-2 rounded text-sm">
+                        <div className="flex justify-between font-medium text-gray-800">
+                          <span>{slot.day}</span>
+                          <span>{slot.startTime}-{slot.endTime}</span>
+                        </div>
+                        <div className="text-gray-500 text-xs mt-1">
+                          {slot.location}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">打球風格</span>
                 <span className="font-medium">{getPlayingStyleText(user.playingStyle)}</span>
               </div>
 
-              {user.location && (
+              {user.gender && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">所在地</span>
-                  <span className="font-medium text-sm">{user.location.address}</span>
+                  <span className="text-gray-600">性別</span>
+                  <span className="font-medium">{user.gender === 'male' ? '男' : user.gender === 'female' ? '女' : '不限'}</span>
                 </div>
               )}
 

@@ -120,7 +120,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
             if (room.id === message.chatRoomId) {
               return {
                 ...room,
-                participants: room.participants.map(p => 
+                participants: room.participants.map(p =>
                   p.userId === userId ? { ...p, lastReadAt: readAt } : p
                 )
               };
@@ -156,7 +156,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
   const fetchChatRooms = useCallback(async () => {
     try {
       setLoading(true);
-      const rooms = await apiRequest('/api/v1/chat/rooms');
+      const rooms = await apiRequest('/chat/rooms');
       setChatRooms(rooms);
     } catch (err) {
       setError(err instanceof Error ? err.message : '獲取聊天室列表失敗');
@@ -169,7 +169,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
   const createChatRoom = useCallback(async (request: CreateChatRoomRequest): Promise<ChatRoom> => {
     try {
       setLoading(true);
-      const room = await apiRequest('/api/v1/chat/rooms', {
+      const room = await apiRequest('/chat/rooms', {
         method: 'POST',
         body: JSON.stringify(request),
       });
@@ -205,17 +205,17 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
   // 發送訊息
   const sendMessage = useCallback(async (request: SendMessageRequest): Promise<ChatMessage> => {
     try {
-      const message = await apiRequest('/api/v1/chat/messages', {
+      const message = await apiRequest('/chat/messages', {
         method: 'POST',
         body: JSON.stringify(request),
       });
-      
+
       // 本地更新訊息列表（WebSocket 也會推送，但本地更新可以提供更好的用戶體驗）
       setMessages(prev => ({
         ...prev,
         [request.chatRoomId]: [...(prev[request.chatRoomId] || []), message]
       }));
-      
+
       return message;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '發送訊息失敗';
@@ -230,9 +230,9 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
       await apiRequest(`/chat/rooms/${roomId}/read`, {
         method: 'POST',
       });
-      
+
       // 更新本地未讀計數
-      setChatRooms(prev => prev.map(room => 
+      setChatRooms(prev => prev.map(room =>
         room.id === roomId ? { ...room, unreadCount: 0 } : room
       ));
     } catch (err) {
@@ -246,7 +246,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
       await apiRequest(`/chat/rooms/${roomId}/join`, {
         method: 'POST',
       });
-      
+
       // 發送 WebSocket 加入訊息
       sendWebSocketMessage({
         type: 'join_room',
@@ -263,7 +263,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
       await apiRequest(`/chat/rooms/${roomId}/leave`, {
         method: 'POST',
       });
-      
+
       // 發送 WebSocket 離開訊息
       sendWebSocketMessage({
         type: 'leave_room',
@@ -277,7 +277,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
   // 獲取在線用戶
   const fetchOnlineUsers = useCallback(async () => {
     try {
-      const response = await apiRequest('/api/v1/chat/online-users');
+      const response = await apiRequest('/chat/online-users');
       setOnlineUsers(response.onlineUsers || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '獲取在線用戶失敗');
@@ -330,7 +330,7 @@ export const useChatApi = ({ accessToken }: UseChatApiOptions = {}) => {
     leaveChatRoom,
     fetchOnlineUsers,
     connectWebSocket,
-    
+
     // WebSocket 方法
     sendWebSocketMessage,
   };

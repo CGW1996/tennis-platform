@@ -55,7 +55,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post<FindMatchesResponse>('/api/v1/matching/find', criteria);
+      const response = await api.post<FindMatchesResponse>('/discovery/find', criteria);
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '尋找配對失敗';
@@ -71,7 +71,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<RandomMatchesResponse>(`/matching/random?count=${count}`);
+      const response = await api.get<RandomMatchesResponse>(`/discovery/random?count=${count}`);
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '獲取隨機配對失敗';
@@ -90,7 +90,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post<CardActionResponse>('/api/v1/matching/card-action', {
+      const response = await api.post<CardActionResponse>('/discovery/card-action', {
         targetUserId,
         action,
       });
@@ -120,9 +120,9 @@ export const useMatchingApi = () => {
       if (action) {
         params.append('action', action);
       }
-      
+
       const response = await api.get<CardInteractionHistoryResponse>(
-        `/matching/card-history?${params.toString()}`
+        `/discovery/card-history?${params.toString()}`
       );
       return response.data;
     } catch (err: any) {
@@ -148,9 +148,9 @@ export const useMatchingApi = () => {
         limit: limit.toString(),
         unread_only: unreadOnly.toString(),
       });
-      
+
       const response = await api.get<MatchNotificationsResponse>(
-        `/matching/notifications?${params.toString()}`
+        `/discovery/notifications?${params.toString()}`
       );
       return response.data;
     } catch (err: any) {
@@ -167,7 +167,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      await api.put(`/matching/notifications/${notificationId}/read`);
+      await api.put(`/discovery/notifications/${notificationId}/read`);
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '標記通知失敗';
       setError(errorMessage);
@@ -182,7 +182,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<ReputationResponse>('/api/v1/matching/reputation');
+      const response = await api.get<ReputationResponse>('/discovery/reputation');
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '獲取信譽分數失敗';
@@ -198,7 +198,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<StatisticsResponse>('/api/v1/matching/statistics');
+      const response = await api.get<StatisticsResponse>('/discovery/statistics');
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '獲取統計資料失敗';
@@ -221,8 +221,8 @@ export const useMatchingApi = () => {
         page: page.toString(),
         limit: limit.toString(),
       });
-      
-      const response = await api.get(`/matching/history?${params.toString()}`);
+
+      const response = await api.get(`/discovery/history?${params.toString()}`);
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '獲取配對歷史失敗';
@@ -243,7 +243,7 @@ export const useMatchingApi = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post('/api/v1/matching/create', data);
+      const response = await api.post('/discovery/create', data);
       return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || '創建配對失敗';

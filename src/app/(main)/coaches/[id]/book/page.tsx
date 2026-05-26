@@ -114,7 +114,7 @@ export default function BookCoachPage() {
         total_price: calculateTotalPrice(),
       };
 
-      await apiClient.post('/api/v1/bookings', bookingData);
+      await apiClient.post('/bookings', bookingData);
       toast.success('預約成功！');
       window.location.href = '/dashboard/bookings';
     } catch (error: any) {
@@ -230,8 +230,8 @@ export default function BookCoachPage() {
                             disabled={!slot.available}
                             onClick={() => setValue('start_time', slot.start_time)}
                             className={`p-2 rounded-lg border text-sm transition-colors ${slot.available
-                                ? 'border-gray-300 hover:border-emerald-500 hover:bg-emerald-50'
-                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                              ? 'border-gray-300 hover:border-emerald-500 hover:bg-emerald-50'
+                              : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                               }`}
                           >
                             {slot.start_time} - {slot.end_time}
